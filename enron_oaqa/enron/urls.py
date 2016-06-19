@@ -20,5 +20,7 @@ urlpatterns = patterns('',
     
     url(r'^api/history_questions/', views.history_questions),
 
+    url(r'^api/get_answers/', views.get_answers),
+
     url(r'^admin/', include(admin.site.urls)),
 )

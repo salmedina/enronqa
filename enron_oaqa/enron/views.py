@@ -1,8 +1,11 @@
+import json
 from sys import stderr
 
 from django.shortcuts import render
+import requests
 from rest_framework import viewsets, status
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 
 from enron.models import HistoryQuestion
@@ -35,3 +38,16 @@ def history_questions(request):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['POST'])
+@parser_classes((JSONParser,))
+def get_answers(request):
+    url = "http://gold.lti.cs.cmu.edu:18072/liveqa"
+    data = {"qid":"20130828153959AAtXAEs",
+            "title":request.data['title'],
+            "body":"",
+            "category":""}
+    headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
+    r = requests.post(url, data=json.dumps(data), headers=headers)
+    result = json.loads("".join(r))
+    return Response({'answers': result})

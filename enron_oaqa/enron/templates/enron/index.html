@@ -62,7 +62,7 @@
 			<div id="sidebar-wrapper" ng-controller="History as historyCtrl">
 				<ul class="sidebar-nav">
 					<li class="sidebar-brand">History</li>
-					<li ng-repeat="history in historyQuestions"><a href="#">[[[history.question]]]</a></li>
+					<li ng-repeat="history in historyQuestions">[[[history.question]]]</li>
 				</ul>
 			</div>
 		</div>
@@ -70,8 +70,9 @@
 		<div class="col-md-8">
 			<div class="answerContainer" ng-controller="Answer as answerCtrl">
 				<div class="answerPanel" ng-repeat="answer in answerCtrl.answers" draggable="true">
-					<div>Source: [[[answer.source]]]</div>
-					<p>Content: [[[answer.body]]]</p>
+					<div>Source: <a href="[[[answer.source]]]">[[[answer.source]]]</a></div>
+					<div>Score: [[[answer.score]]]</div>
+					<p><b>Content:</b> [[[answer.body]]]</p>
 					<div class="">
 						<button ng-click="answerCtrl.thumbsUp(answer.id)" class="btn"
 							ng-class="{'btn-success':answerCtrl.thumbsUp[answer.id]}">

@@ -1,34 +1,33 @@
 (function() {
-	var app = angular.module("enron", []).factory(
-			'DataService',
-			[
-					'$http',
-					function($http) {
-						function unwrapHistoryQuestions(data) {
-							console.log("data retrieved: " + data);
-							var questions = [];
-							for (var i = 0; i < data.data.length; i++) {
-								questions.push(data.data[i]);
-							}
-							console.log(questions);
-							return questions;
+	var app = angular.module("enron", []);
+
+	app.service('DataService', [
+			'$http',
+			function($http) {
+				this.questions = [];
+
+				this.getHistoryQuestions = function() {
+					var questions = this.questions;
+					return $http.get('/enron/api/history_questions').then(function(data) {
+						// console.log("data retrieved: " + data);
+						for (var i = 0; i < data.data.length; i++) {
+							questions.push(data.data[i]);
 						}
+						return questions;
+					});
+				};
 
-						function addHistoryQuestion(newQuestion) {
-							var req = { method : 'POST', url : '/enron/api/history_questions/',
-								headers : { 'Content-Type' : 'application/json' }, data : newQuestion };
+				this.addHistoryQuestion = function(newQuestion) {
+					var req = { method : 'POST', url : '/enron/api/history_questions/',
+						headers : { 'Content-Type' : 'application/json' }, data : newQuestion };
 
-							$http(req).then(function() {
-								console.log("Question inserted!");
-							});
-						}
-
-						return { getHistoryQuestions : function() {
-							// return
-							// $http.get('/enron/api/historyquestions/?format=json').then(unwrapHistoryQuestions);
-							return $http.get('/enron/api/history_questions').then(unwrapHistoryQuestions);
-						}, addHistoryQuestion : addHistoryQuestion };
-					} ]);
+					var questions = this.questions;
+					$http(req).then(function() {
+						console.log("Question inserted!");
+						questions.push(newQuestion);
+					});
+				};
+			} ]);
 
 	app.config(function($interpolateProvider) {
 		$interpolateProvider.startSymbol('[[[');
@@ -51,18 +50,55 @@
 		};
 	});
 
-	app.controller("Question", [ "DataService", "$http", "answerService",
+	app.controller("Question", [
+			"DataService",
+			"$http",
+			"answerService",
 			function(DataService, $http, answerService) {
-				this.questionText = "";
+				this.questionText = ""; // initial value;
+
 				this.submitQuestion = function() {
 					console.log("QuestionText: " + this.questionText);
-					$http.get("http://jsonplaceholder.typicode.com/posts").success(function(data) {
-						console.log("return " + data.length + " answers with the first being " + data[0].id);
-						answerService.setAnswers(data);
-					});
+					var liveqaData = { 'qid' : '20130828153959AAtXAEs', 'title' : this.questionText,
+						'body' : '', 'category' : '', };
+					// var req = { method : 'POST', url :
+					// 'http://gold.lti.cs.cmu.edu:18072/liveqa',
+					// headers : { 'Content-type' : 'application/json', 'Accept' :
+					// 'application/json' },
+					// data : JSON.stringify(liveqaData) };
 
-					var newQuestion = { question : this.questionText };
-					DataService.addHistoryQuestion(newQuestion);
+					var req = { method : 'POST', url : '/enron/api/get_answers/',
+						headers : { 'Content-type' : 'application/json', 'Accept' : 'application/json' },
+						data : JSON.stringify(liveqaData) };
+
+					var questionText = this.questionText;
+					$http(req).success(
+							function(data, status, headers, config) {
+								console.log("Question submitted! Result is:");
+								console.log(data);
+								console.log(status);
+
+								var answers = [];
+								var returnedAnswers = data.answers.candidates;
+								for (var i = 0; i < returnedAnswers.length; i++) {
+									answers.push({ 'id' : i, 'source' : returnedAnswers[i].url,
+										'score' : returnedAnswers[i].score, 'body' : returnedAnswers[i].bestAnswer });
+								}
+								console.log("answers: " + answers);
+								answerService.setAnswers(answers);
+								var newQuestion = { question : questionText };
+								DataService.addHistoryQuestion(newQuestion);
+							}).error(function(data, status, headers, config) {
+						console.log("Question submission failed!");
+						console.log(data);
+						console.log(status);
+					});
+					// $http.get("http://jsonplaceholder.typicode.com/posts").success(function(data)
+					// {
+					// console.log("return " + data.length + " answers with the first
+					// being " + data[0].id);
+					// answerService.setAnswers(data);
+					// });
 
 					this.questionText = "";
 				};
@@ -94,7 +130,7 @@
 	app.controller("History", [ "$scope", "DataService", function($scope, DataService) {
 		DataService.getHistoryQuestions().then(function(historyQuestions) {
 			$scope.historyQuestions = historyQuestions;
-			console.log("History questions: " + $scope.historyQuestions);
+			// console.log("History questions: " + $scope.historyQuestions);
 		});
 	} ]);
 })();
