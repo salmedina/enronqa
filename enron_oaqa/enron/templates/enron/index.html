@@ -1,0 +1,90 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
+<link rel="stylesheet" type="text/css" href="{% static 'enron/simple-sidebar.css' %}" />
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+<script type="text/javascript" src="{% static 'enron/app.js' %}"></script>
+<script type="text/javascript" src="{% static 'enron/angular-drag-and-drop-lists.min.js' %}"></script>
+<title>CMU OAQA Enron</title>
+<style>
+.logo {
+	max-height: 35px;
+	border: 0 none;
+	display: inline-block;
+	height: auto;
+	max-width: 100%;
+	vertical-align: middle;
+}
+
+.title {
+	display: inline-block;
+}
+
+.answerPanel {
+	border: 1px;
+	border-style: solid;
+	margin: 5px;
+	padding: 10px;
+}
+
+.answerContainer {
+	
+}
+</style>
+</head>
+<body ng-app="enron">
+	<div class="container text-center">
+		<a class="navbar-brand" href="#"> <img class="logo" src="http://colloquium.lti.cs.cmu.edu/images/lti.png"></a>
+		<h3 class="title">CMU OAQA</h3>
+	</div>
+	<div class="container-fluid questionDiv" ng-controller="Question as questionCtrl">
+		<div class="row">
+			<form class="form-horizontal" ng-submit="questionCtrl.submitQuestion()">
+				<div class="col-md-2"></div>
+				<div class="col-md-8">
+					<input type="text" class="form-control" placeholder="Ask something..." ng-model="questionCtrl.questionText"
+						required autofocus />
+				</div>
+				<div class="col-md-2">
+					<input type="submit" class="btn btn-primary" value="Submit" />
+				</div>
+			</form>
+		</div>
+	</div>
+	<hr class="divider">
+	<div class="container-fluid">
+
+		<div class="col-md-2">
+			<!-- Sidebar -->
+			<div id="sidebar-wrapper" ng-controller="History as historyCtrl">
+				<ul class="sidebar-nav">
+					<li class="sidebar-brand">History</li>
+					<li ng-repeat="history in historyQuestions"><a href="#">[[[history.question]]]</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<div class="col-md-8">
+			<div class="answerContainer" ng-controller="Answer as answerCtrl">
+				<div class="answerPanel" ng-repeat="answer in answerCtrl.answers" draggable="true">
+					<div>Source: [[[answer.source]]]</div>
+					<p>Content: [[[answer.body]]]</p>
+					<div class="">
+						<button ng-click="answerCtrl.thumbsUp(answer.id)" class="btn"
+							ng-class="{'btn-success':answerCtrl.thumbsUp[answer.id]}">
+							<span class="glyphicon glyphicon-thumbs-up"></span>
+						</button>
+						<button ng-click="answerCtrl.thumbsDown(answer.id)" class="btn"
+							ng-class="{'btn-danger':answerCtrl.thumbsDown[answer.id]}">
+							<span class="glyphicon glyphicon-thumbs-down"></span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
