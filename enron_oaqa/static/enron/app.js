@@ -1,6 +1,18 @@
 (function() {
 	var app = angular.module("enron", []);
 
+	app.service('QuestionService', function() {
+		this.question = "";
+		
+		this.setQuestion = function(q) {
+			this.question = q;
+		};
+
+		this.getQuestion = function() {
+			return this.question;
+		};
+	});
+
 	app.service('DataService', [
 			'$http',
 			function($http) {
@@ -24,7 +36,7 @@
 					var questions = this.questions;
 					$http(req).then(function() {
 						console.log("Question inserted!");
-						questions.push(newQuestion);
+						questions.unshift(newQuestion);
 					});
 				};
 			} ]);
@@ -61,6 +73,8 @@
 					console.log("QuestionText: " + this.questionText);
 					var liveqaData = { 'qid' : '20130828153959AAtXAEs', 'title' : this.questionText,
 						'body' : '', 'category' : '', };
+					
+					// Send request from client side.
 					// var req = { method : 'POST', url :
 					// 'http://gold.lti.cs.cmu.edu:18072/liveqa',
 					// headers : { 'Content-type' : 'application/json', 'Accept' :
@@ -93,6 +107,7 @@
 						console.log(data);
 						console.log(status);
 					});
+					// Testing code.
 					// $http.get("http://jsonplaceholder.typicode.com/posts").success(function(data)
 					// {
 					// console.log("return " + data.length + " answers with the first
@@ -100,7 +115,8 @@
 					// answerService.setAnswers(data);
 					// });
 
-					this.questionText = "";
+					// Zhong: keep the question text
+					//this.questionText = "";
 				};
 			} ]);
 
@@ -132,5 +148,9 @@
 			$scope.historyQuestions = historyQuestions;
 			// console.log("History questions: " + $scope.historyQuestions);
 		});
+		
+		this.askQuestion = function(s) {
+			
+		};
 	} ]);
 })();

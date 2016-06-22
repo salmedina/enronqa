@@ -57,17 +57,17 @@
 	<hr class="divider">
 	<div class="container-fluid">
 
-		<div class="col-md-2">
+		<div class="col-sm-2">
 			<!-- Sidebar -->
 			<div id="sidebar-wrapper" ng-controller="History as historyCtrl">
 				<ul class="sidebar-nav">
 					<li class="sidebar-brand">History</li>
-					<li ng-repeat="history in historyQuestions">[[[history.question]]]</li>
+					<li ng-repeat="history in historyQuestions"><a ng-click="historyCtrl.askQuestion(history.question)">[[[history.question]]]</a></li>
 				</ul>
 			</div>
 		</div>
 
-		<div class="col-md-8">
+		<div class="col-sm-8">
 			<div class="answerContainer" ng-controller="Answer as answerCtrl">
 				<div class="answerPanel" ng-repeat="answer in answerCtrl.answers" draggable="true">
 					<div>Source: <a href="[[[answer.source]]]">[[[answer.source]]]</a></div>
