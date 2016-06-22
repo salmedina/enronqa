@@ -62,7 +62,7 @@
 			<div id="sidebar-wrapper" ng-controller="History as historyCtrl">
 				<ul class="sidebar-nav">
 					<li class="sidebar-brand">History</li>
-					<li ng-repeat="history in historyQuestions"><a ng-click="historyCtrl.askQuestion(history.question)">[[[history.question]]]</a></li>
+					<li ng-repeat="history in historyQuestions"><a ng-click="historyCtrl.askQuestion(history.question)" href="#">[[[history.question]]]</a></li>
 				</ul>
 			</div>
 		</div>

@@ -1,18 +1,6 @@
 (function() {
 	var app = angular.module("enron", []);
 
-	app.service('QuestionService', function() {
-		this.question = "";
-		
-		this.setQuestion = function(q) {
-			this.question = q;
-		};
-
-		this.getQuestion = function() {
-			return this.question;
-		};
-	});
-
 	app.service('DataService', [
 			'$http',
 			function($http) {
@@ -41,13 +29,6 @@
 				};
 			} ]);
 
-	app.config(function($interpolateProvider) {
-		$interpolateProvider.startSymbol('[[[');
-		$interpolateProvider.endSymbol(']]]');
-	});
-
-	console.log("app.js is loaded.");
-
 	app.service('answerService', function() {
 		this.answers = [];
 
@@ -62,58 +43,71 @@
 		};
 	});
 
+	app.service('questionService', ['$http', 'answerService', 'DataService', function($http, answerService, DataService) {
+		this.submitQuestion = function(questionText) {
+			var liveqaData = { 'qid' : '20130828153959AAtXAEs', 'title' : questionText,
+					'body' : '', 'category' : '', };
+				
+				// Send request from client side.
+				// var req = { method : 'POST', url :
+				// 'http://gold.lti.cs.cmu.edu:18072/liveqa',
+				// headers : { 'Content-type' : 'application/json', 'Accept' :
+				// 'application/json' },
+				// data : JSON.stringify(liveqaData) };
+
+				var req = { method : 'POST', url : '/enron/api/get_answers/',
+					headers : { 'Content-type' : 'application/json', 'Accept' : 'application/json' },
+					data : JSON.stringify(liveqaData) };
+
+				$http(req).success(
+						function(data, status, headers, config) {
+							console.log("Question submitted! Result is:");
+							console.log(data);
+							console.log(status);
+
+							var answers = [];
+							var returnedAnswers = data.answers.candidates;
+							for (var i = 0; i < returnedAnswers.length; i++) {
+								answers.push({ 'id' : i, 'source' : returnedAnswers[i].url,
+									'score' : returnedAnswers[i].score, 'body' : returnedAnswers[i].bestAnswer });
+							}
+							console.log("answers: " + answers);
+							answerService.setAnswers(answers);
+							var newQuestion = { question : questionText };
+							DataService.addHistoryQuestion(newQuestion);
+						}).error(function(data, status, headers, config) {
+					console.log("Question submission failed!");
+					console.log(data);
+					console.log(status);
+				});
+				// Testing code.
+				// $http.get("http://jsonplaceholder.typicode.com/posts").success(function(data)
+				// {
+				// console.log("return " + data.length + " answers with the first
+				// being " + data[0].id);
+				// answerService.setAnswers(data);
+				// });
+		};
+	}]);
+
+	app.config(function($interpolateProvider) {
+		$interpolateProvider.startSymbol('[[[');
+		$interpolateProvider.endSymbol(']]]');
+	});
+
+	console.log("app.js is loaded.");
+
 	app.controller("Question", [
 			"DataService",
-			"$http",
+			"questionService",
 			"answerService",
-			function(DataService, $http, answerService) {
+			function(DataService, questionService, answerService) {
 				this.questionText = ""; // initial value;
 
 				this.submitQuestion = function() {
 					console.log("QuestionText: " + this.questionText);
-					var liveqaData = { 'qid' : '20130828153959AAtXAEs', 'title' : this.questionText,
-						'body' : '', 'category' : '', };
 					
-					// Send request from client side.
-					// var req = { method : 'POST', url :
-					// 'http://gold.lti.cs.cmu.edu:18072/liveqa',
-					// headers : { 'Content-type' : 'application/json', 'Accept' :
-					// 'application/json' },
-					// data : JSON.stringify(liveqaData) };
-
-					var req = { method : 'POST', url : '/enron/api/get_answers/',
-						headers : { 'Content-type' : 'application/json', 'Accept' : 'application/json' },
-						data : JSON.stringify(liveqaData) };
-
-					var questionText = this.questionText;
-					$http(req).success(
-							function(data, status, headers, config) {
-								console.log("Question submitted! Result is:");
-								console.log(data);
-								console.log(status);
-
-								var answers = [];
-								var returnedAnswers = data.answers.candidates;
-								for (var i = 0; i < returnedAnswers.length; i++) {
-									answers.push({ 'id' : i, 'source' : returnedAnswers[i].url,
-										'score' : returnedAnswers[i].score, 'body' : returnedAnswers[i].bestAnswer });
-								}
-								console.log("answers: " + answers);
-								answerService.setAnswers(answers);
-								var newQuestion = { question : questionText };
-								DataService.addHistoryQuestion(newQuestion);
-							}).error(function(data, status, headers, config) {
-						console.log("Question submission failed!");
-						console.log(data);
-						console.log(status);
-					});
-					// Testing code.
-					// $http.get("http://jsonplaceholder.typicode.com/posts").success(function(data)
-					// {
-					// console.log("return " + data.length + " answers with the first
-					// being " + data[0].id);
-					// answerService.setAnswers(data);
-					// });
+					questionService.submitQuestion(this.questionText);
 
 					// Zhong: keep the question text
 					//this.questionText = "";
@@ -143,14 +137,17 @@
 
 	} ]);
 
-	app.controller("History", [ "$scope", "DataService", function($scope, DataService) {
+	app.controller("History", [ "$scope", "DataService", "questionService", function($scope, DataService, questionService) {
 		DataService.getHistoryQuestions().then(function(historyQuestions) {
 			$scope.historyQuestions = historyQuestions;
 			// console.log("History questions: " + $scope.historyQuestions);
 		});
 		
+//		$scope.$watch(function() { return Service.getNumber(); }, function(value) { $scope.number = value; });
+
 		this.askQuestion = function(s) {
-			
+			questionService.submitQuestion(s);
 		};
+		
 	} ]);
 })();
