@@ -37,8 +37,12 @@
 </head>
 <body ng-app="enron">
 	<div class="container text-center">
-		<a class="navbar-brand" href="#"> <img class="logo" src="http://colloquium.lti.cs.cmu.edu/images/lti.png"></a>
-		<h1 class="title">CMU OAQA</h1>
+		<a class="navbar-brand" href="#"> <img class="logo" src="https://s1.yimg.com/rz/d/yahoo_en-US_f_p_bestfit_2x.png"></a>
+		<h1 class="title">
+			InMind OAQA
+			<br/>
+			<small>Multisource QA</small>
+		</h1>
 	</div>
 	<div class="container-fluid questionDiv" ng-controller="Question as questionCtrl">
 		<div class="row">
@@ -70,9 +74,13 @@
 		<div class="col-sm-8">
 			<div class="answerContainer" ng-controller="Answer as answerCtrl">
 				<div class="answerPanel" ng-repeat="answer in answerCtrl.answers" draggable="true">
-					<div>Source: <a href="[[[answer.source]]]">[[[answer.source]]]</a></div>
+					<div>
+						Source: <a href="[[[answer.source]]]">[[[answer.source]]]</a>
+					</div>
 					<div>Score: [[[answer.score]]]</div>
-					<p><b>Content:</b> [[[answer.body]]]</p>
+					<p>
+						<b>Content:</b> [[[answer.body]]]
+					</p>
 					<div class="">
 						<button ng-click="answerCtrl.thumbsUp(answer.id)" class="btn"
 							ng-class="{'btn-success':answerCtrl.thumbsUp[answer.id]}">
