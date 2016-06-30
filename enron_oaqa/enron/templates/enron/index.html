@@ -5,6 +5,7 @@
 <meta charset="UTF-8">
 <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="{% static 'enron/style.css' %}" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <script type="text/javascript" src="{% static 'enron/app.js' %}"></script>
 <script type="text/javascript" src="{% static 'enron/angular-drag-and-drop-lists.min.js' %}"></script>
@@ -44,14 +45,14 @@
 	</div>
 	<div class="container-fluid questionDiv" ng-controller="Question as questionCtrl">
 		<div class="row">
-			<form class="form-horizontal" ng-submit="questionCtrl.submitQuestion()">
+			<form class="form-horizontal">
 				<div class="col-sm-2"></div>
 				<div class="col-sm-8">
 					<input type="text" class="form-control" placeholder="Ask something..." ng-model="questionCtrl.questionText"
 						required autofocus />
 				</div>
 				<div class="col-sm-2">
-					<input type="submit" class="btn btn-primary" value="Ask" />
+					<input type="button" class="btn btn-primary" click-and-disable="questionCtrl.submitQuestion()" value="Ask" />
 				</div>
 			</form>
 		</div>
@@ -64,12 +65,19 @@
 			<div ng-controller="History as historyCtrl">
 				<h5>History</h5>
 				<ul class="list-unstyled">
-					<li class="history-question-item" ng-repeat="history in historyQuestions"><a ng-click="historyCtrl.askQuestion(history.question)" href="#">[[[history.question]]]</a></li>
+					<li class="history-question-item" ng-repeat="history in historyQuestions"><a
+						ng-click="historyCtrl.askQuestion(history.question)" href="#">[[[history.question]]]</a></li>
 				</ul>
 			</div>
 		</div>
 
 		<div class="col-sm-10">
+			<div class="loading-spiner-holder" data-loading>
+				<div class="loading-spiner">
+					<img src="{% static 'enron/spinner.gif' %}" />
+				</div>
+			</div>
+
 			<div class="answerContainer" ng-controller="Answer as answerCtrl">
 				<div class="answerPanel" ng-repeat="answer in answerCtrl.answers" draggable="true">
 					<div>
