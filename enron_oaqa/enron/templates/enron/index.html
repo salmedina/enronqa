@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
-<link rel="stylesheet" type="text/css" href="{% static 'enron/simple-sidebar.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'enron/style.css' %}" />
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 <script type="text/javascript" src="{% static 'enron/app.js' %}"></script>
 <script type="text/javascript" src="{% static 'enron/angular-drag-and-drop-lists.min.js' %}"></script>
@@ -39,20 +39,18 @@
 	<div class="container text-center">
 		<a class="navbar-brand" href="#"> <img class="logo" src="https://s1.yimg.com/rz/d/yahoo_en-US_f_p_bestfit_2x.png"></a>
 		<h1 class="title">
-			InMind OAQA
-			<br/>
-			<small>Multisource QA</small>
+			InMind OAQA <br /> <small>Multisource QA</small>
 		</h1>
 	</div>
 	<div class="container-fluid questionDiv" ng-controller="Question as questionCtrl">
 		<div class="row">
 			<form class="form-horizontal" ng-submit="questionCtrl.submitQuestion()">
-				<div class="col-md-2"></div>
-				<div class="col-md-8">
+				<div class="col-sm-2"></div>
+				<div class="col-sm-8">
 					<input type="text" class="form-control" placeholder="Ask something..." ng-model="questionCtrl.questionText"
 						required autofocus />
 				</div>
-				<div class="col-md-2">
+				<div class="col-sm-2">
 					<input type="submit" class="btn btn-primary" value="Ask" />
 				</div>
 			</form>
@@ -61,17 +59,17 @@
 	<hr class="divider">
 	<div class="container-fluid">
 
-		<div class="col-sm-2">
+		<div class="col-sm-2 hidden-xs">
 			<!-- Sidebar -->
-			<div id="sidebar-wrapper" ng-controller="History as historyCtrl">
-				<ul class="sidebar-nav">
-					<li class="sidebar-brand">History</li>
-					<li ng-repeat="history in historyQuestions"><a ng-click="historyCtrl.askQuestion(history.question)" href="#">[[[history.question]]]</a></li>
+			<div ng-controller="History as historyCtrl">
+				<h5>History</h5>
+				<ul class="list-unstyled">
+					<li class="history-question-item" ng-repeat="history in historyQuestions"><a ng-click="historyCtrl.askQuestion(history.question)" href="#">[[[history.question]]]</a></li>
 				</ul>
 			</div>
 		</div>
 
-		<div class="col-sm-8">
+		<div class="col-sm-10">
 			<div class="answerContainer" ng-controller="Answer as answerCtrl">
 				<div class="answerPanel" ng-repeat="answer in answerCtrl.answers" draggable="true">
 					<div>
