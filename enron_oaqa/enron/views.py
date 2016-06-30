@@ -29,7 +29,12 @@ class HistoryQuestionViewSet(viewsets.ModelViewSet):
 def history_questions(request):
     if request.method == 'GET':
         history_questions = HistoryQuestion.objects.all().order_by('-id')
-        serializer = HistoryQuestionSerializer(history_questions[:10], many=True)
+        # display 10 unique questions
+        questions_to_display = []
+        for q in history_questions:
+            if len(questions_to_display) < 10 and q.question not in [qq.question for qq in questions_to_display]:
+                questions_to_display.append(q)
+        serializer = HistoryQuestionSerializer(questions_to_display, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
@@ -40,7 +45,7 @@ def history_questions(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
-@parser_classes((JSONParser,))
+@parser_classes(JSONParser,)
 def get_answers(request):
     url = "http://gold.lti.cs.cmu.edu:18072/liveqa"
     data = {"qid":"20130828153959AAtXAEs",
