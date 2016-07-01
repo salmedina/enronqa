@@ -31,7 +31,12 @@
         var questions = this.questions;
         $http(req).then(function() {
           console.log("Question inserted!");
-          questions.unshift(newQuestion);
+          var data = questions.find( function( ele ) { 
+            return ele.question == newQuestion.question;
+					} );
+          if (!data) {
+						questions.unshift(newQuestion);
+          }
         });
       };
     }
