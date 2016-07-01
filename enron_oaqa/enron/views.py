@@ -45,7 +45,7 @@ def history_questions(request):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['POST'])
-@parser_classes(JSONParser,)
+@parser_classes((JSONParser,))
 def get_answers(request):
     url = "http://gold.lti.cs.cmu.edu:18072/liveqa"
     data = {"qid":"20130828153959AAtXAEs",
