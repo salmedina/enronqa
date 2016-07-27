@@ -1,4 +1,5 @@
 import json
+import re
 from sys import stderr
 
 from django.shortcuts import render
@@ -55,4 +56,6 @@ def get_answers(request):
     headers = {'Content-type': 'application/json', 'Accept': 'application/json'}
     r = requests.post(url, data=json.dumps(data), headers=headers)
     result = json.loads("".join(r))
+    for answer in result['candidates']:
+        answer['shortUrl'] = re.search(r"https?://([^/]+)/", answer['url']).group(1)
     return Response({'answers': result})

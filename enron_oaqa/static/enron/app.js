@@ -97,6 +97,7 @@
             answers.push({
               'id': i,
               'source': returnedAnswers[i].url,
+              'shortUrl': returnedAnswers[i].shortUrl,
               'score': returnedAnswers[i].score,
               'body': returnedAnswers[i].bestAnswer
             });

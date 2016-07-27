@@ -3,6 +3,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" type="text/css" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />
 <link rel="stylesheet" type="text/css" href="{% static 'enron/style.css' %}" />
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
@@ -47,11 +48,11 @@
 		<div class="row">
 			<form class="form-horizontal">
 				<div class="col-sm-2"></div>
-				<div class="col-sm-8">
+				<div class="col-sm-8 col-xs-9">
 					<input type="text" class="form-control" placeholder="Ask something..." ng-model="questionCtrl.questionText"
 						required autofocus />
 				</div>
-				<div class="col-sm-2">
+				<div class="col-sm-2 col-xs-3">
 					<input type="submit" class="btn btn-primary" click-and-disable="questionCtrl.submitQuestion()" value="Ask" />
 				</div>
 			</form>
@@ -81,7 +82,7 @@
 			<div class="answerContainer" ng-controller="Answer as answerCtrl">
 				<div class="answerPanel" ng-repeat="answer in answerCtrl.answers" draggable="true">
 					<div>
-						Source: <a href="[[[answer.source]]]">[[[answer.source]]]</a>
+						Source: <a href="[[[answer.source]]]">[[[answer.shortUrl]]]</a>
 					</div>
 					<div>Score: [[[answer.score]]]</div>
 					<p>
