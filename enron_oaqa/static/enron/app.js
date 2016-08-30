@@ -1,6 +1,6 @@
 
 (function() {
-  var app = angular.module("enron", []);
+  var app = angular.module("enron", ['ngSanitize']);
 
   app.service('DataService', [
     '$http',
@@ -94,6 +94,7 @@
           var answers = [];
           var returnedAnswers = response.data.answers.candidates;
           for (var i = 0; i < returnedAnswers.length; i++) {
+            // ZAL-NOTES: The actual params required for display
             answers.push({
               'id': i,
               'source': returnedAnswers[i].url,
