@@ -61,7 +61,16 @@
     'answerService',
     'DataService',
     function($http, answerService, DataService) {
-      this.submitQuestion = function(questionText, options) {
+    	this.optionGetters = {};
+    	
+    	this.setOptions = function(optionGetters) {
+    		this.optionGetters = optionGetters;
+    	}
+    	
+      this.submitQuestion = function(questionText) {
+      	var options = {};
+      	options.useEnron = this.optionGetters.useEnron();
+      	options.useLiveQA = this.optionGetters.useLiveQA();
         var liveqaData = {
           'qid': '20130828153959AAtXAEs',
           'title': questionText,
@@ -138,6 +147,11 @@
   	
   		$scope.useLiveQA = true;
   		$scope.useEnron = true;
+  		
+  		questionService.setOptions({
+  			useLiveQA: function() { return $scope.useLiveQA; }, 
+  			useEnron: function() { return $scope.useEnron; }
+  		});
 
       this.questionText = ""; // initial value;
 
@@ -186,7 +200,7 @@
       // function(value) { $scope.number = value; });
 
       this.askQuestion = function(s) {
-        questionService.submitQuestion(s, {'useLiveQA': true , 'useEnron': true});
+        questionService.submitQuestion(s);
       };
 
     }
