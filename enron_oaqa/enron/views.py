@@ -127,7 +127,7 @@ def get_answers(request):
         score_sum += result['candidates'][i]['score']
     for i in range(len(result['candidates'])):
         result['candidates'][i]['rank'] = i + 1
-        result['candidates'][i]['score'] = '%.4f'%(result['candidates'][i]['score']/score_sum)
+        result['candidates'][i]['score'] = '%.5f'%(result['candidates'][i]['score']/score_sum)
 
     result['candidates'] = result['candidates'][:20]
 
