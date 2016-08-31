@@ -108,6 +108,7 @@
             // ZAL-NOTES: The actual params required for display
             answers.push({
               'id': i,
+              'rank': returnedAnswers[i].rank,
               'source': returnedAnswers[i].url,
               'shortUrl': returnedAnswers[i].shortUrl,
               'score': returnedAnswers[i].score,

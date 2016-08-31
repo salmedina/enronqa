@@ -97,6 +97,7 @@
 
 			<div class="answerContainer" ng-controller="Answer as answerCtrl">
 				<div class="answerPanel" ng-repeat="answer in answerCtrl.answers" draggable="false">
+					<div>Rank: [[[answer.rank]]]</div>
 					<div>
 						Source: <a href="[[[answer.source]]]">[[[answer.shortUrl]]]</a>
 					</div>

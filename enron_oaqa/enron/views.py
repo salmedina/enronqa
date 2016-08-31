@@ -1,3 +1,4 @@
+from __future__ import division
 import json
 import re
 from sys import stderr
@@ -56,8 +57,6 @@ def history_questions(request):
 def get_answers(request):
     useEnron = request.data['options']['useEnron']
     useLiveQA = request.data['options']['useLiveQA']
-    now_str = dt.datetime.now().strftime("%H:%M:%S")
-    rank_pos = 0
 
     result = {}
     result['answerResource'] = 'Enron'
@@ -75,7 +74,6 @@ def get_answers(request):
         r = requests.post(url, data=json.dumps(data), headers=headers)
         result = json.loads("".join(r))
         for answer in result['candidates']:
-            rank_pos += 1
             answer['shortUrl'] = 'LiveQA - {}'.format(re.search(r"https?://([^/]+)/", answer['url']).group(1))
 
     if useEnron:
@@ -102,7 +100,7 @@ def get_answers(request):
 
             result['candidates'].append(tmp_formatted_input)
 
-    result['candidates'] = sorted(result['candidates'], key=lambda k: k['score']) 
+    result['candidates'] = sorted(result['candidates'], key=lambda k: k['score'], reverse=True)
 
     # Highlighting the results
     # Consider only nouns, verbs, adjectives and adverbs
@@ -115,7 +113,6 @@ def get_answers(request):
     highlight_terms = []
     for word, word_pos in query_blob.pos_tags:
         if word_pos in valid_pos_tags and word not in stop:
-        #if word_pos not in stop:
             highlight_terms.append(str(word))
 
     # Tag them with HTML spans
@@ -123,6 +120,14 @@ def get_answers(request):
         highlight_regex = re.compile(r"\b{}\b".format(term), re.IGNORECASE)
         for i in range(len(result['candidates'])):
             result['candidates'][i]['bestAnswer'] = highlight_regex.sub('<span class="relevantEntity">'+term+'</span>', result['candidates'][i]['bestAnswer'])
+
+    # Normalize scores
+    score_sum = 0
+    for i in range(len(result['candidates'])):
+        score_sum += result['candidates'][i]['score']
+    for i in range(len(result['candidates'])):
+        result['candidates'][i]['rank'] = i + 1
+        result['candidates'][i]['score'] = result['candidates'][i]['score']/score_sum
 
     result['candidates'] = result['candidates'][:20]
 
