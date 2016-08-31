@@ -52,6 +52,8 @@ def history_questions(request):
 @api_view(['POST'])
 @parser_classes((JSONParser,))
 def get_answers(request):
+    useEnron = request.data['options']['useEnron']
+    useLiveQA = request.data['options']['useLiveQA']
     # Requesting info from LIVE-QA
     url = "http://gold.lti.cs.cmu.edu:18072/liveqa"
     data = {"qid":"20130828153959AAtXAEs",
@@ -69,15 +71,15 @@ def get_answers(request):
     core = solr.SolrConnection(core_url)
     solr_query = '{} & fl=*,score'.format(request.data['title'])
     solr_res = core.query(solr_query)
-
-
+ 
+ 
     for solr_result in solr_res.results[:10]:
         tmp_formatted_input = {}
         tmp_formatted_input['url'] = '#'
         tmp_formatted_input['shortUrl'] = 'Enron Corpus - {}'.format(solr_result['file'][0])
         tmp_formatted_input['score'] = solr_result['score']
         tmp_formatted_input['bestAnswer'] = solr_result['body'][0].replace('\n','<br/>')
-        
+         
         result['candidates'].append(tmp_formatted_input)
 
     result['candidates'] = sorted(result['candidates'], key=lambda k: k['score']) 
@@ -91,7 +93,7 @@ def get_answers(request):
     for word, word_pos in query_blob.pos_tags:
         if word_pos in valid_pos_tags and word not in stop:
             highlight_terms.append(str(word))
-    
+     
     for term in highlight_terms:
         highlight_regex = re.compile(term, re.IGNORECASE)
         for i in range(len(result['candidates'])):

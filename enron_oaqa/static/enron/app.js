@@ -61,12 +61,13 @@
     'answerService',
     'DataService',
     function($http, answerService, DataService) {
-      this.submitQuestion = function(questionText) {
+      this.submitQuestion = function(questionText, options) {
         var liveqaData = {
           'qid': '20130828153959AAtXAEs',
           'title': questionText,
           'body': '',
           'category': '',
+          'options': options
         };
 
         // Send request from client side.
@@ -132,14 +133,18 @@
 
   console.log("app.js is loaded.");
 
-  app.controller("Question", ["DataService", "questionService", "answerService",
-    function(DataService, questionService, answerService) {
+  app.controller("Question", ["$scope", "DataService", "questionService", "answerService",
+    function($scope, DataService, questionService, answerService) {
+  	
+  		$scope.useLiveQA = true;
+  		$scope.useEnron = true;
+
       this.questionText = ""; // initial value;
 
       this.submitQuestion = function() {
         console.log("QuestionText: " + this.questionText);
 
-        return questionService.submitQuestion(this.questionText);
+        return questionService.submitQuestion(this.questionText, {'useLiveQA': $scope.useLiveQA, 'useEnron': $scope.useEnron});
 
         // Zhong: keep the question text
         // this.questionText = "";
@@ -181,7 +186,7 @@
       // function(value) { $scope.number = value; });
 
       this.askQuestion = function(s) {
-        questionService.submitQuestion(s);
+        questionService.submitQuestion(s, {'useLiveQA': true , 'useEnron': true});
       };
 
     }
