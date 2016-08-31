@@ -13,7 +13,9 @@ from enron.models import HistoryQuestion
 from enron.serializers import HistoryQuestionSerializer
 
 import solr
-
+from textblob import TextBlob
+from textblob.taggers import NLTKTagger
+from nltk.corpus import stopwords
 
 def index(request):
     context = {
@@ -80,7 +82,17 @@ def get_answers(request):
 
     result['candidates'] = sorted(result['candidates'], key=lambda k: k['score']) 
 
-    for term in request.data['title'].split():
+    # Highlighting the results
+    valid_pos_tags = ['FW','JJ','JJR','JJS','NN','NNS','NNP','NNPS', 'RB', 'RBR', 'RBS', 'VB','VBD','VBG','VBN','VBZ','']
+    stop = set(stopwords.words('english'))
+    nltk_tagger = NLTKTagger()
+    query_blob = TextBlob(request.data['title'], pos_tagger=nltk_tagger)
+    highlight_terms = []
+    for word, word_pos in query_blob.pos_tags:
+        if word_pos in valid_pos_tags and word not in stop:
+            highlight_terms.append(str(word))
+    
+    for term in highlight_terms:
         highlight_regex = re.compile(term, re.IGNORECASE)
         for i in range(len(result['candidates'])):
             result['candidates'][i]['bestAnswer'] = highlight_regex.sub('<span class="relevantEntity">'+term+'</span>', result['candidates'][i]['bestAnswer'])
