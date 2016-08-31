@@ -47,6 +47,7 @@
 
     this.setAnswers = function(newObj) {
       for (var i = 0; i < newObj.length; i++) {
+        this.answers.length = newObj.length;
         this.answers[i] = newObj[i];
       }
     };

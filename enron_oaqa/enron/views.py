@@ -76,7 +76,7 @@ def get_answers(request):
         result = json.loads("".join(r))
         for answer in result['candidates']:
             rank_pos += 1
-            answer['shortUrl'] = '{} LiveQA - {}'.format(now_str, re.search(r"https?://([^/]+)/", answer['url']).group(1))
+            answer['shortUrl'] = 'LiveQA - {}'.format(re.search(r"https?://([^/]+)/", answer['url']).group(1))
 
     if useEnron:
         if not useLiveQA:
@@ -96,7 +96,7 @@ def get_answers(request):
         for solr_result in solr_res.results:
             tmp_formatted_input = {}
             tmp_formatted_input['url'] = '#'
-            tmp_formatted_input['shortUrl'] = '{} Enron Corpus - {}'.format(now_str, solr_result['file'][0])
+            tmp_formatted_input['shortUrl'] = 'Enron Corpus - {}'.format(solr_result['file'][0])
             tmp_formatted_input['score'] = solr_result['score']
             tmp_formatted_input['bestAnswer'] = solr_result['body'][0].replace('\n','<br/>')
 
@@ -114,8 +114,8 @@ def get_answers(request):
     query_blob = TextBlob(request.data['title'], pos_tagger=nltk_tagger)
     highlight_terms = []
     for word, word_pos in query_blob.pos_tags:
-        #if word_pos in valid_pos_tags and word not in stop:
-        if word_pos not in stop:
+        if word_pos in valid_pos_tags and word not in stop:
+        #if word_pos not in stop:
             highlight_terms.append(str(word))
 
     # Tag them with HTML spans
@@ -124,10 +124,6 @@ def get_answers(request):
         for i in range(len(result['candidates'])):
             result['candidates'][i]['bestAnswer'] = highlight_regex.sub('<span class="relevantEntity">'+term+'</span>', result['candidates'][i]['bestAnswer'])
 
-    for i in range(len(result['candidates'])):
-        result['candidates'][i]['shortUrl'] = '[{}] {}'.format(i, result['candidates'][i]['shortUrl'])
-
     result['candidates'] = result['candidates'][:20]
-    result['candidates'][0]['bestAnswer'] = 'useLiveQA: {}<br/>useEnron: {}<br/>total: {}'.format(str(useLiveQA), str(useEnron), len(result['candidates']))
 
     return Response({'answers': result})
