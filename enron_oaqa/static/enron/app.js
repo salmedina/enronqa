@@ -2,6 +2,25 @@
 (function() {
   var app = angular.module("enron", ['ngSanitize']);
 
+  app.factory('sharedMessageService', function($rootScope){
+    var mailbox = {};
+    mailbox.message = '';
+
+    mailbox.broadcastMessage = function(msg) {
+      this.message = msg;
+      this.broadcastItem();
+    };
+    mailbox.broadcastItem = function() {
+      $rootScope.$broadcast('newMailboxEvent');
+    };
+
+    mailbox.broadcastQueryCompleted = function() {
+      $rootScope.$broadcast('newQueryCompleted');
+    };
+
+    return mailbox;
+  });
+
   app.service('DataService', [
     '$http',
     function($http) {
@@ -61,7 +80,8 @@
     '$http',
     'answerService',
     'DataService',
-    function($http, answerService, DataService) {
+    'sharedMessageService',
+    function($http, answerService, DataService, sharedMessageService) {
     	this.optionGetters = {};
     	
     	this.setOptions = function(optionGetters) {
@@ -121,6 +141,7 @@
             question: questionText
           };
           DataService.addHistoryQuestion(newQuestion);
+          sharedMessageService.broadcastQueryCompleted();
         }, function errorCallback(response) {
           console.log("Question submission failed!");
           console.log(response.data);
@@ -144,11 +165,12 @@
 
   console.log("app.js is loaded.");
 
-  app.controller("Question", ["$scope", "DataService", "questionService", "answerService",
-    function($scope, DataService, questionService, answerService) {
+  app.controller("Question", ["$scope", "DataService", "questionService", "answerService", "sharedMessageService",
+    function($scope, DataService, questionService, answerService, sharedMessageService) {
   	
   		$scope.useLiveQA = true;
   		$scope.useEnron = true;
+
   		
   		questionService.setOptions({
   			useLiveQA: function() { return $scope.useLiveQA; }, 
@@ -159,20 +181,21 @@
 
       this.submitQuestion = function() {
         console.log("QuestionText: " + this.questionText);
-
         return questionService.submitQuestion(this.questionText, {'useLiveQA': $scope.useLiveQA, 'useEnron': $scope.useEnron});
-
-        // Zhong: keep the question text
-        // this.questionText = "";
       };
+
+      $scope.$on('newMailboxEvent', function(){
+        $scope.questionCtrl.questionText = sharedMessageService.message;
+      });
     }
   ]);
 
   app.controller("Answer", ["$scope", "answerService", function($scope, answerService) {
     this.answers = answerService.getAnswers();
-    this.thumbsUp = new Array(6);
-    this.thumbsDown = new Array(6);
-    for (var i = 0; i < 6; ++i) {
+    this.thumbsUp = new Array(20);
+    this.thumbsDown = new Array(20);
+
+    for (var i = 0; i < 20; ++i) {
       this.thumbsUp[i] = false;
       this.thumbsDown[i] = false;
     }
@@ -189,10 +212,18 @@
       this.thumbsUp[answerID] = false;
     };
 
+    $scope.$on('newQueryCompleted', function(){
+      //TODO: Store the thumbs up/down state along with their corresponding answerID and query string
+      for (var i=0; i < 20; ++i) {
+        $scope.answerCtrl.thumbsUp[i] = false;
+        $scope.answerCtrl.thumbsDown[i] = false;
+      }
+    });
+
   }]);
 
-  app.controller("History", ["$scope", "DataService", "questionService",
-    function($scope, DataService, questionService) {
+  app.controller("History", ["$rootScope","$scope", "DataService", "questionService", "sharedMessageService",
+    function($rootScope, $scope, DataService, questionService, sharedMessageService) {
       DataService.getHistoryQuestions().then(function(historyQuestions) {
         $scope.historyQuestions = historyQuestions;
         // console.log("History questions: " + $scope.historyQuestions);
@@ -202,6 +233,7 @@
       // function(value) { $scope.number = value; });
 
       this.askQuestion = function(s) {
+        sharedMessageService.broadcastMessage(s);
         questionService.submitQuestion(s);
       };
 
