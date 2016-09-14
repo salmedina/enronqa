@@ -3,22 +3,22 @@
   var app = angular.module("enron", ['ngSanitize']);
 
   app.factory('sharedMessageService', function($rootScope){
-    var mailbox = {};
-    mailbox.message = '';
+    var messageService = {};
+    messageService.message = '';
 
-    mailbox.broadcastMessage = function(msg) {
+    messageService.broadcastMessage = function(msg) {
       this.message = msg;
       this.broadcastItem();
     };
-    mailbox.broadcastItem = function() {
+    messageService.broadcastItem = function() {
       $rootScope.$broadcast('newMailboxEvent');
     };
 
-    mailbox.broadcastQueryCompleted = function() {
+    messageService.broadcastQueryCompleted = function() {
       $rootScope.$broadcast('newQueryCompleted');
     };
 
-    return mailbox;
+    return messageService;
   });
 
   app.service('DataService', [
@@ -52,9 +52,9 @@
           console.log("Question inserted!");
           var data = questions.find( function( ele ) { 
             return ele.question == newQuestion.question;
-					} );
+          });
           if (!data) {
-						questions.unshift(newQuestion);
+            questions.unshift(newQuestion);
           }
         });
       };
@@ -171,7 +171,6 @@
   		$scope.useLiveQA = true;
   		$scope.useEnron = true;
 
-  		
   		questionService.setOptions({
   			useLiveQA: function() { return $scope.useLiveQA; }, 
   			useEnron: function() { return $scope.useEnron; }
