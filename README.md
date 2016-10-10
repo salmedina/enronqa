@@ -30,6 +30,8 @@ The sever can be launched by calling the ```launch.sh``` script. By default it w
 
 The Interface is composed by three main components: the history bar on the left, the search box alongside its button and the search result panes. Since we are using AngularJS, the full interface behavior is programmed within the Javascript file ```enron_oaqa/static/enron/app.js```.
 
+![Schema](images/Coarse_Schema.jpg)
+
 The strucutre of the ```app.js``` file is as follows:
 
 - **Factories:**
